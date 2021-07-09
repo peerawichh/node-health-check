@@ -1,6 +1,6 @@
 version: '3'
 services:
-    token-alert:
+    node-health-check:
         build: .
         ports:
             - ${PORT:-7100}:${PORT:-7100}

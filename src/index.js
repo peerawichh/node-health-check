@@ -117,25 +117,16 @@ async function readBlockInterval() {
     if (new Date().getMinutes() === 0) {
 
         const requestSuccessRateList = await getRequestSuccessRate(idpRequests, asRequests);
-
         const nodeIdListToNotify = Object.keys(requestSuccessRateList);
 
         if (nodeIdListToNotify.length) {
-
             let message;
-
             for (const nodeId of nodeIdListToNotify) {
-
                 message = message.concat(`${nodeId} has request success rate of ${requestSuccessRateList[nodeId]} percent`);
-
             }
-
-            notify.lineNotify(message);
-
+            await notify.lineNotify(message);
         }
-
     }
-
 }
 
 async function groupRequestByNodeId(requestList, role) {
@@ -210,26 +201,19 @@ async function CatagorizeRequestStatus(idpListWithRelatedRequests, asListWithRel
             const request = await getRequestStatus(requestId);
 
             if (request.closed) {
-
                 if (!close.includes(requestId)) {
                     close.push(requestId);
                 }
             }
-
             else if (!request.closed && !request.timed_out) {
-
                 if (!pending.includes(requestId)) {
                     pending.push(requestId);
                 }
-
             } else if (request.timed_out && !request.response_list.length) {
-
                 if (!timeout.includes(requestId)) {
                     timeout.push(requestId);
                 }
-
             } else {
-
                 if (!pending.includes(requestId)) {
                     pending.push(requestId);
                 }
@@ -249,7 +233,6 @@ async function CatagorizeRequestStatus(idpListWithRelatedRequests, asListWithRel
     for (const nodeId of asNodeIdList) {
 
         const requestList = asListWithRelatedRequests[nodeId];
-
         const previousRequestList = Object.keys(asPreviousRequestList).length ? (Object.keys(asPreviousRequestList).includes(nodeId) ? asPreviousRequestList[nodeId] : {}) : {};
 
         const filteredRequests = await Promise.all([requestList.reduce(async (result, requestId) => {
@@ -263,47 +246,34 @@ async function CatagorizeRequestStatus(idpListWithRelatedRequests, asListWithRel
             const request = await getRequestStatus(requestId);
 
             if (request.closed) {
-
                 if (!close.includes(requestId)) {
                     close.push(requestId);
                 }
-
             } else if (!request.closed && !request.timed_out) {
-
                 if (!pending.includes(requestId)) {
                     pending.push(requestId);
                 }
-
             } else if (request.timed_out && request.response_list.length) {
-
                 if (request.response_list[0].status === 'accept') {
 
                     const serviceList = request.data_request_list;
-
                     serviceList.forEach(service => {
-
                         if (service.as_id_list.includes(nodeId)) {
-
                             const responseList = service.response_list;
                             const foundResponse = responseList.find(response => response.as_id === nodeId);
-
                             if (!foundResponse) {
-
                                 if (!timeout.includes(requestId)) {
                                     timeout.push(requestId);
                                 }
-
                             }
                         }
                     });
                 }
 
             } else {
-
                 if (!pending.includes(requestId)) {
                     pending.push(requestId);
                 }
-
             }
 
             requestIdList['closedRequests'] = close;
