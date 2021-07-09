@@ -114,10 +114,25 @@ async function readBlockInterval() {
 
     const [idpRequests, asRequests] = await processPendingRequest(idpCatagorizedRequests, asCatagorizedRequests);
 
-    if (new Date().getMinutes() === 20) {
+    if (new Date().getMinutes() === 0) {
 
-    const requestSuccessRateList = await getRequestSuccessRate(idpRequests, asRequests);
-    console.log(requestSuccessRateList);
+        const requestSuccessRateList = await getRequestSuccessRate(idpRequests, asRequests);
+
+        const nodeIdListToNotify = Object.keys(requestSuccessRateList);
+
+        if (nodeIdListToNotify.length) {
+
+            let message;
+
+            for (const nodeId of nodeIdListToNotify) {
+
+                message = message.concat(`${nodeId} has request success rate of ${requestSuccessRateList[nodeId]} percent`);
+
+            }
+
+            notify.lineNotify(message);
+
+        }
 
     }
 
@@ -326,6 +341,8 @@ async function getRequestSuccessRate(idpRequests, asRequests) {
 
         const successRate = Math.round((completedRequestCount / requestCount) * 100);
 
+        console.log(`${nodeId} : ${successRate} % (completed ${completedRequestCount} out of ${requestCount})`);
+
         requestList['closedRequests'] = [];
         requestList['timedOutRequests'] = [];
 
@@ -349,6 +366,8 @@ async function getRequestSuccessRate(idpRequests, asRequests) {
 
         const successRate = Math.round((completedRequestCount / requestCount) * 100);
 
+        console.log(`${nodeId} : ${successRate} % (completed ${completedRequestCount} out of ${requestCount})`);
+
         requestList['closedRequests'] = [];
         requestList['timedOutRequests'] = [];
 
@@ -365,7 +384,7 @@ async function getRequestSuccessRate(idpRequests, asRequests) {
     fs.writeFileSync(idpPreviousRequestListFilePath, JSON.stringify(idpRequests));
     fs.writeFileSync(asPreviousRequestListFilePath, JSON.stringify(asRequests));
 
-    return {...idpSuccessRate, ...asSuccessRate}
+    return { ...idpSuccessRate, ...asSuccessRate }
 
 }
 
