@@ -1,0 +1,16 @@
+version: '3'
+services:
+    token-alert:
+        build: .
+        ports:
+            - ${PORT:-7100}:${PORT:-7100}
+        environment:
+            - TM_RPC_IP=${TM_RPC_IP}
+            - TM_RPC_PORT=${TM_RPC_PORT}
+            - LINE_GROUP_TOKEN=${LINE_GROUP_TOKEN}
+            - REQUEST_SUCCESS_RATE_THRESHOLD=${REQUEST_SUCCESS_RATE_THRESHOLD}
+            - RP_CRON_HOUR=${RP_CRON_HOUR}
+            - RP_LIST=${RP_LIST}
+        volumes:
+            - ./data:/app/data
+        restart: unless-stopped
