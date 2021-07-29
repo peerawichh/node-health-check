@@ -114,7 +114,7 @@ async function readBlockInterval() {
 
     const [idpRequests, asRequests] = await processPendingRequest(idpCatagorizedRequests, asCatagorizedRequests);
 
-    // if (new Date().getMinutes() === 0) {
+    if (new Date().getMinutes() === 0) {
 
         const requestSuccessRateList = await getRequestSuccessRate(idpRequests, asRequests);
         const nodeIdListToNotify = Object.keys(requestSuccessRateList);
@@ -129,7 +129,7 @@ async function readBlockInterval() {
             }
             await notify.lineNotify(message);
         }
-    // }
+    }
 }
 
 async function groupRequestByNodeId(requestList, role) {
