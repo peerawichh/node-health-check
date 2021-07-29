@@ -11,6 +11,7 @@ services:
             - REQUEST_SUCCESS_RATE_THRESHOLD=${REQUEST_SUCCESS_RATE_THRESHOLD}
             - RP_CRON_HOUR=${RP_CRON_HOUR}
             - RP_LIST=${RP_LIST}
+            - NOTIFY_HOUR=${NOTIFY_HOUR}
         volumes:
             - ./data:/app/data
         restart: unless-stopped

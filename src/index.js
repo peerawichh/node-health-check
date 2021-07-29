@@ -7,7 +7,7 @@ const fs = require('fs');
 const cron = require('node-cron');
 const notify = require('./notify');
 
-cron.schedule(`*/5 * * * *`, readBlockInterval, { timezone: "Asia/Bangkok" });
+cron.schedule(`5 */5 * * * *`, readBlockInterval, { timezone: "Asia/Bangkok" });
 
 // const rpCronJob = cron.schedule(`30 0 ${config.RP_CRON_HOUR} * * *`, rpNodeHealthCheck,{ timezone: "Asia/Bangkok" });
 // rpCronJob.start();
@@ -119,10 +119,13 @@ async function readBlockInterval() {
         const requestSuccessRateList = await getRequestSuccessRate(idpRequests, asRequests);
         const nodeIdListToNotify = Object.keys(requestSuccessRateList);
 
-        if (nodeIdListToNotify.length) {
-            let message;
+        if (nodeIdListToNotify.length && config.NOTIFY_HOUR.split(',').includes((new Date().getHours() + 7).toString())) {
+            const hour = new Date().getHours() + 7;
+            let message = `Summarized from requests created between ${hour-1}.00 - ${hour}.00`;
             for (const nodeId of nodeIdListToNotify) {
-                message = message.concat(`${nodeId} has request success rate of ${requestSuccessRateList[nodeId]} percent`);
+                const nodeInfo = await getNodeInfo(nodeId);
+                const requestSummary = requestSuccessRateList[nodeId]
+                message = message.concat(`\n\n${nodeInfo.marketing_name_en} (${nodeInfo.role === 'IDP' ? 'IdP' : nodeInfo.role})\nRequest success rate: ${Number.isInteger(requestSummary['request_success_percentage']) ? requestSummary['request_success_percentage'] : requestSummary['request_success_percentage'].toFixed(2) }%\n(Completed ${requestSummary['completed_request']} out of ${requestSummary['total_request']})`);
             }
             await notify.lineNotify(message);
         }
@@ -319,7 +322,11 @@ async function getRequestSuccessRate(idpRequests, asRequests) {
         idpRequests[nodeId] = requestList;
 
         if (successRate < config.REQUEST_SUCCESS_RATE_THRESHOLD && successRate != NaN) {
-            result[nodeId] = successRate;
+            result[nodeId] = {
+                request_success_percentage: successRate,
+                total_request: requestCount,
+                completed_request: completedRequestCount
+            };
         }
 
         return result;
@@ -334,7 +341,7 @@ async function getRequestSuccessRate(idpRequests, asRequests) {
 
         const requestCount = completedRequestCount + timedOutRequestCount;
 
-        const successRate = Math.round((completedRequestCount / requestCount) * 100);
+        const successRate = (completedRequestCount / requestCount) * 100;
 
         console.log(`${nodeId} : ${successRate} % (completed ${completedRequestCount} out of ${requestCount})`);
 
@@ -343,8 +350,12 @@ async function getRequestSuccessRate(idpRequests, asRequests) {
 
         asRequests[nodeId] = requestList;
 
-        if (successRate < config.REQUEST_SUCCESS_RATE_THRESHOLD) {
-            result[nodeId] = successRate;
+        if (successRate < config.REQUEST_SUCCESS_RATE_THRESHOLD && successRate != NaN) {
+            result[nodeId] = {
+                request_success_percentage: successRate,
+                total_request: requestCount,
+                completed_request: completedRequestCount
+            };
         }
 
         return result;
@@ -524,4 +535,4 @@ async function getNodeInfo(node_id) {
     }
 }
 
-// readBlockInterval();
+readBlockInterval();
