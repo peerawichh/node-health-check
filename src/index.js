@@ -7,7 +7,7 @@ const fs = require('fs');
 const cron = require('node-cron');
 const notify = require('./notify');
 
-// cron.schedule(`5 */5 * * * *`, readBlockInterval, { timezone: "Asia/Bangkok" });
+cron.schedule(`5 */5 * * * *`, readBlockInterval, { timezone: "Asia/Bangkok" });
 
 // const rpCronJob = cron.schedule(`30 0 ${config.RP_CRON_HOUR} * * *`, rpNodeHealthCheck,{ timezone: "Asia/Bangkok" });
 // rpCronJob.start();
@@ -535,4 +535,4 @@ async function getNodeInfo(node_id) {
     }
 }
 
-readBlockInterval();
+// readBlockInterval();
