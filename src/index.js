@@ -119,8 +119,8 @@ async function readBlockInterval() {
         const requestSuccessRateList = await getRequestSuccessRate(idpRequests, asRequests);
         const nodeIdListToNotify = Object.keys(requestSuccessRateList);
 
-        if (nodeIdListToNotify.length && config.NOTIFY_HOUR.split(',').includes((new Date().getHours() + 7).toString())) {
-            const hour = new Date().getHours() + 7;
+        if (nodeIdListToNotify.length && config.NOTIFY_HOUR.split(',').includes((new Date().getHours()).toString())) {
+            const hour = new Date().getHours();
             let message = `Summarized from requests created between ${hour-1}.00 - ${hour}.00`;
             for (const nodeId of nodeIdListToNotify) {
                 const nodeInfo = await getNodeInfo(nodeId);
