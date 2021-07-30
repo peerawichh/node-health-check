@@ -120,7 +120,7 @@ async function readBlockInterval() {
         const nodeIdListToNotify = Object.keys(requestSuccessRateList);
 
         if (nodeIdListToNotify.length && config.NOTIFY_HOUR.split(',').includes((new Date().getHours()).toString())) {
-            const hour = new Date().getHours();
+            const hour = new Date().getHours() + 7;
             let message = `Summarized from requests created between ${hour-1}.00 - ${hour}.00`;
             for (const nodeId of nodeIdListToNotify) {
                 const nodeInfo = await getNodeInfo(nodeId);
@@ -128,6 +128,7 @@ async function readBlockInterval() {
                 message = message.concat(`\n\n${nodeInfo.marketing_name_en} (${nodeInfo.role === 'IDP' ? 'IdP' : nodeInfo.role})\nRequest success rate: ${Number.isInteger(requestSummary['request_success_percentage']) ? requestSummary['request_success_percentage'] : requestSummary['request_success_percentage'].toFixed(2) }%\n(Completed ${requestSummary['completed_request']} out of ${requestSummary['total_request']})`);
             }
             await notify.lineNotify(message);
+            console.log(message);
         }
     }
 }
