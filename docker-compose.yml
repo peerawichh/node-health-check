@@ -14,4 +14,6 @@ services:
             - NOTIFY_HOUR=${NOTIFY_HOUR}
         volumes:
             - ./data:/app/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
         restart: unless-stopped

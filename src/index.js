@@ -312,7 +312,7 @@ async function getRequestSuccessRate(idpRequests, asRequests) {
 
         const requestCount = completedRequestCount + timedOutRequestCount;
 
-        const successRate = Math.round((completedRequestCount / requestCount) * 100);
+        const successRate = (completedRequestCount / requestCount) * 100;
 
         console.log(`${nodeId} : ${successRate} % (completed ${completedRequestCount} out of ${requestCount})`);
 
