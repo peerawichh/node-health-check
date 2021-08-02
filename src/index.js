@@ -121,7 +121,7 @@ async function readBlockInterval() {
 
         if (nodeIdListToNotify.length && config.NOTIFY_HOUR.split(',').includes((new Date().getHours()).toString())) {
             const hour = new Date().getHours() + 7;
-            let message = `Summarized from requests created between ${hour-1}.00 - ${hour}.00`;
+            let message = `\n\nSummarized from requests created between ${hour-1}.00 - ${hour}.00`;
             for (const nodeId of nodeIdListToNotify) {
                 const nodeInfo = await getNodeInfo(nodeId);
                 const requestSummary = requestSuccessRateList[nodeId]
